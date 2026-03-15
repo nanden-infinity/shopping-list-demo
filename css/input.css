@@ -1,0 +1,37 @@
+@import 'tailwindcss';
+@layer components {
+  .add-modo {
+    background-color: var(--color-gray-600);
+    color: var(--color-white);
+    &:hover {
+      background-color: var(--color-gray-700);
+    }
+  }
+  .edited-modo {
+    background-color: var(--color-green-600);
+    color: var(--color-white);
+    &:hover {
+      background-color: var(--color-green-800);
+    }
+  }
+}
+.edit-modo {
+  color: #ccc;
+  font-weight: 600;
+}
+
+.show {
+  animation: show 0.5s forwards;
+  transition: .5s;
+}
+
+@keyframes show {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -8px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}

@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="/css/output.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+    />
+    <link rel="icon" href="/imag/note.png" type="image/png" />
+    <script src="/js/script.js" type="module" defer></script>
+    <title>Filter Challenges</title>
+  </head>
+  <body class="max-sm:bg-amber-50/2">
+    <header class="max-w-md mx-auto px-8">
+      <div
+        class="container mx-auto space-x-4 py-12 px-8 max-sm:justify-center max-sm:items-end flex items-center"
+      >
+        <a href="#">
+          <img src="/imag/note.png" alt="" class="size-12" />
+        </a>
+        <h1 class="text-2xl">Card-List</h1>
+      </div>
+    </header>
+    <!-- Form -->
+    <section class="bg-sky-100/5">
+      <div class="max-w-md mx-auto py-8 px-12">
+        <form action="" name="formulario">
+          <input
+            type="text"
+            placeholder="type something"
+            id="input--item"
+            name="input"
+            class="input--item p-2 border-[.05px] outline-[.05px] border-gray-300 rounded pl-6 w-full focus:outline-gray-400"
+          />
+          <button
+            class="addItem add-modo cursor-pointer text-white mt-4 p-2 px-4 md:w-full rounded"
+          >
+            <i class="fa-solid fa-plus text-white"></i>
+            Add Item
+          </button>
+        </form>
+        <div class="box--input--filter border-b-2 border-slate-300 mt-8">
+          <input
+            type="text"
+            placeholder="search item"
+            class="p-2 border-none rounded pl-6 w-full focus:outline-none ring-1 ring-transparent focus:ring-gray-700 input-filter"
+          />
+        </div>
+
+        <ul id="list"
+          class="items lg:space-y-0 pt-8 group grid lg:grid-cols-2 items-center gap-4"
+        >
+          <li
+            class="flex items-center hover:bg-linear-to-t from-gray-900/9 transition hover:text-slate-600 duration-150 cursor-pointer justify-between p-2 bg-slate-200 rounded"
+          >
+            Baguette
+            <button>
+              <i
+                class="fa-solid fa-xmark text-red-500 cursor-pointer hover:scale-100"
+              ></i>
+            </button>
+          </li>
+          <li
+            class="flex items-center hover:bg-linear-to-t from-gray-900/9 transition hover:text-slate-600 duration-150 cursor-pointer justify-between p-2 bg-slate-200 rounded"
+          >
+            Cheese
+            <button>
+              <i class="fa-solid fa-xmark text-red-500 cursor-pointer"></i>
+            </button>
+          </li>
+        </ul>
+
+        <div class="box-clear mt-8">
+          <button
+            class="btn-clear-all flex justify-center items-center text-center bg-gray-600 hover:bg-gray-700 cursor-pointer text-white mt-4 p-2 w-full rounded"
+          >
+            Clear All
+          </button>
+        </div>
+      </div>
+    </section>
+    <!-- Main -->
+  </body>
+</html>
