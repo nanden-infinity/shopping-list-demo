@@ -6,15 +6,44 @@ const items = document.querySelector('.items');
 const btnClear = document.querySelector('.btn-clear-all');
 const btnForm = formItem.querySelector('.addItem');
 let isEditMode = false;
-formItem.addEventListener('submit', onAddSubmit);
 
-function onAddSubmit(event) {
+function onAddItemSubmit(event) {
   this.classList.add('transition', 'duration-200');
-  console.log(this);
-
   event.preventDefault();
   const valueInput = event.target.elements.input;
   const newText = valueInput.value;
+
+  // Check input value  === ""
+
+  if (newText === '') return alert('please enter something');
+
+  // Create Item DOM element
+  addItemToDom(newText);
+  addItemToStorage(newText);
+  // Add Item to local storage
+  // Check for Edit Modo
+  if (isEditMode) {
+    isEditMode = false;
+    const itemToEdit = items.querySelector('li.edit-modo');
+    itemToEdit?.classList.remove('edit-modo');
+    itemToEdit.remove();
+
+    // Prettier-ignore
+    isEditMode
+      ? btnForm.classList.remove('edited-modo')
+      : btnForm.classList.add('add-modo');
+    !btnForm.classList.contains('edited-modo')
+      ? (btnForm.innerHTML = '<i class="fa-solid fa-pen"></i> Update Item')
+      : (btnForm.innerHTML = '<i class="fa-solid fa-plus"></i>Add Item');
+  }
+
+  valueInput.value = '';
+  btnForm.classList.remove('edited-modo');
+  btnForm.classList.add('add-modo');
+}
+
+function addItemToDom(text) {
+  // Create and appdending child
   const li = document.createElement('li');
   li.classList.add(
     'bg-gray-600',
@@ -26,42 +55,19 @@ function onAddSubmit(event) {
     'w-full',
     'rounded',
   );
-  // Check input value  === ""
-
-  if (newText === '') return alert('please enter something');
-
-  // Check for Edit Modo
-  if (isEditMode) {
-    isEditMode = false;
-    const itemToEdit = items.querySelector('li.edit-modo');
-    itemToEdit?.classList.remove('edit-modo');
-    itemToEdit.remove();
-    console.log(itemToEdit);
-
-    !isEditMode
-      ? btnForm.classList.toggle('edited-modo')
-      : btnForm.classList.toggle('add-modo');
-    btnForm.classList.contains('edited-modo')
-      ? (btnForm.innerHTML = '<i class="fa-solid fa-pen"></i> Update Item')
-      : (btnForm.innerHTML = '<i class="fa-solid fa-plus"></i>Add Item');
-  }
-  // Create and appdending child
-
   li.className =
-    'flex items-center hover:bg-linear-to-t from-gray-900/9 transition hover:text-slate-600 duration-150 cursor-pointer justify-between p-2 bg-slate-200 rounded';
-  li.appendChild(document.createTextNode(newText));
+    'flex items-center hover:bg-linear-to-t from-gray-900/9 transition hover:text-slate-600 duration-150 cursor-pointer justify-between p-2 bg-slate-200 rounded show';
+  li.appendChild(document.createTextNode(text));
   const button = creatButton('flex items-center justify-content-between');
   li.appendChild(button);
+
   setTimeout(
     () => {
-      li.classList.add('show');
-
       items.appendChild(li);
     },
-    (Math.random() * 5 + 2) * 100,
+    Math.random() * 5 * 100,
   );
-  checkUI();
-  valueInput.value = '';
+  checkUI(0);
 }
 
 function creatButton(classes) {
@@ -77,44 +83,67 @@ function createIcon(classes) {
   icon.className = classes;
   return icon;
 }
+function addItemToStorage(item) {
+  let itemsFormStorage = getItemsFromlStorage();
+  // Add new Item to Array
+  itemsFormStorage.push(item);
+  // Convertendo JSON para JSON Stringfy
+  localStorage.setItem('items', JSON.stringify(itemsFormStorage));
+}
 
-items.addEventListener('click', event => {
-  const removeIcon = event.target;
-
-  // If statement for Foreach Looping
-  if (removeIcon.classList.contains('fa-xmark')) {
-    onClickItem(removeIcon);
-    console.log(true);
+function getItemsFromlStorage() {
+  let itemsFormStorage;
+  if (localStorage.getItem('items') === null) {
+    itemsFormStorage = [];
   } else {
-    setItemToEdit(event.target);
+    itemsFormStorage = JSON.parse(localStorage.getItem('items'));
   }
-});
+
+  return itemsFormStorage;
+}
 // Items Remove
-function onClickItem(item) {
+function onClickRemoveItem(item) {
   removeItem(item.closest('li'));
   checkLength();
   return;
 }
 
 function setItemToEdit(item) {
-  // document.querySelector('.edit-modo')?.classList.remove('edit-modo');
+  document.querySelector('.edit-modo')?.classList.remove('edit-modo');
   isEditMode = true;
   item.classList.add('edit-modo');
-  isEditMode
-    ? btnForm.classList.toggle('edited-modo')
-    : btnForm.classList.toggle('add-modo');
-  console.log(isEditMode);
+
+  btnForm.classList.add('edited-modo');
+  btnForm.classList.remove('add-modo');
 
   btnForm.classList.contains('edited-modo')
     ? (btnForm.innerHTML = '<i class="fa-solid fa-pen"></i> Update Item')
     : (btnForm.innerHTML = '<i class="fa-solid fa-plus"></i>Add Item');
   inputForm.value = item.textContent.trim();
-  console.log(item);
+}
+function removeItemDom(event) {
+  const removeIcon = event.target;
+
+  // If statement for Foreach Looping
+  if (removeIcon.classList.contains('fa-xmark')) {
+    onClickRemoveItem(removeIcon);
+  } else {
+    if (event.target !== this)
+      // prettier-ignore
+      setItemToEdit(event.target);
+  }
 }
 function removeItem(item) {
   if (confirm('Are you sure?')) {
     item.remove();
-    checkUI();
+    let element = item.textContent.trim();
+
+    const respo = JSON.parse(localStorage.getItem('items')) || [];
+    let updatedItems = respo.filter(i => i !== element);
+
+    localStorage.setItem('items', JSON.stringify(updatedItems));
+    checkLength();
+    checkUI(0);
   }
 }
 // Getting All Elements in the DOM Page
@@ -155,45 +184,50 @@ function filterItems(e) {
 
 // Check Lenght Items
 function checkLength() {
-  const size = items.querySelectorAll('li').length === 0;
-  checkUI(size);
+  const legthItems = items.querySelectorAll('li').length === 0;
+  checkUI(legthItems);
 }
-function checkUI(status) {
+function checkUI(status = 0) {
   if (status) {
     inputFilter.parentElement.style.display = 'none';
-    btnClear.style.display = 'none';
+    btnClear.parentElement.style.display = 'none';
+    btnForm.classList.remove('edited-modo');
+    btnForm.classList.add('add-modo');
+    btnForm.innerHTML = '<i class="fa-solid fa-plus"></i>Add Item';
+    inputForm.value = '';
   } else {
     inputFilter.parentElement.style.display = 'flex';
-    btnClear.style.display = 'flex';
+    btnClear.parentElement.style.display = 'flex';
   }
+}
+
+function clearItems() {
+  // while(items.firstChild){
+
+  //   items.remove()
+  // }
+  items.innerHTML = '';
+  localStorage.removeItem('items');
+  checkUI(0);
+  checkLength();
+  // inputFilter.parentElement.style.display = 'none';
+  // btnClear.style.display = 'none';
 }
 
 function editItem(item) {
-  let input = (document.querySelector('#input--item').value =
-    item.textContent.trim());
+  let input = document.querySelector('#input--item');
+  input.value = item.textContent.trim();
   if (isEditMode) {
-    const li = items.querySelector('.edit');
-    li?.remove();
-    console.log(li);
-    item.classList.add('edit');
-    btnAdItem.innerHTML = `
-            
-            <i class="fa-solid fa-pen text-white"></i>
-            Edit Item
-          `;
+    item.remove();
+    // item.classList.add('edit-mode');
+    btnAdItem.innerHTML = `<i class="fa-solid fa-pen text-white"></i> Edit Item`;
     btnAdItem.className =
       'bg-green-500 hover:bg-green-600 cursor-pointer text-white mt-4 p-2 md:w-full rounded';
   } else {
-    btnAdItem.innerHTML = `
-            
-            <i class="fa-solid fa-plus text-white"></i>
-            Add Item
-          `;
+    btnAdItem.innerHTML = ` <i class="fa-solid fa-plus text-white"></i> Add Item`;
     btnAdItem.className =
       'bg-gray-500 hover:bg-gray-600 cursor-pointer text-white mt-4 p-2 w-full rounded';
   }
-
-  console.log(item, input);
 }
 
 function resizeModo(e) {
@@ -204,5 +238,27 @@ function resizeModo(e) {
     console.log('false');
   }
 }
-window.addEventListener('resize', resizeModo.bind(this));
-inputFilter.addEventListener('input', filterItems);
+// window.addEventListener('resize', resizeModo.bind(this));
+
+document.addEventListener('DOMContentLoaded', () => {
+  formItem.addEventListener('submit', onAddItemSubmit);
+  items.addEventListener('click', removeItemDom);
+  inputFilter.addEventListener('input', filterItems);
+  btnClear.addEventListener('click', clearItems);
+  checkUI(0);
+  checkLength();
+});
+
+const itemsLocal = JSON.parse(localStorage.getItem('items'));
+
+itemsLocal?.forEach(text => {
+  const html = `<li
+            class="flex items-center hover:bg-linear-to-t from-gray-900/9 transition hover:text-slate-600 duration-150 cursor-pointer justify-between p-2 bg-slate-200 rounded"
+          >
+            ${text}
+            <button>
+              <i class="fa-solid fa-xmark text-red-500 cursor-pointer"></i>
+            </button>
+          </li>`;
+  items.insertAdjacentHTML('afterbegin', html);
+});
