@@ -16,6 +16,8 @@ function displayItems() {
   });
 }
 
+//  Implementando a nova funcionalidade para checar se o item ja  tinha existido na lista se for sim para nao permitir  a duplicacao se caso for nao adicionar uma nova item   dentro do cart
+
 function onAddItemSubmit(event) {
   this.classList.add('transition', 'duration-200');
   event.preventDefault();
@@ -47,6 +49,10 @@ function onAddItemSubmit(event) {
     .map(text => text[0].toUpperCase() + text.slice(1).toLowerCase())
     .join(' ');
 
+  // if(document.querySelectorAll('ul li').forEach(el => el.textContent.indexOf(newText) - 1)){
+  //   alert('Nao Existe')
+  // }
+
   addItemToDom(newText);
   addItemToStorage(newText);
   btnForm.classList.remove('edited-modo');
@@ -67,8 +73,8 @@ function addItemToDom(text) {
     'text-white',
     'mt-4',
     'p-2',
-    'w-full',
     'rounded',
+    'w-full',
   );
   li.className =
     'flex items-center hover:bg-linear-to-t from-gray-900/9 transition hover:text-slate-600 duration-150 cursor-pointer justify-between p-2 bg-slate-200 rounded show';
@@ -78,6 +84,8 @@ function addItemToDom(text) {
 
   items.appendChild(li);
   checkUI(0);
+
+  return items;
 }
 
 function creatButton(classes) {
@@ -156,6 +164,10 @@ function removeItem(item) {
     item.remove();
     let element = item.textContent.trim();
 
+    // Vericando se o item contains a clalist se for sim antes de remover o  item dentro de ul, remover a classliss
+  
+    document.querySelector('.edit-modo').classList.remove('edit-modo');
+    inputForm.value = '';
     const respo = JSON.parse(localStorage.getItem('items')) || [];
     let updatedItems = respo.filter(i => i !== element);
 
