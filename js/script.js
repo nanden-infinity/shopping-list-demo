@@ -28,6 +28,11 @@ function onAddItemSubmit(event) {
 
   if (newText === '') return alert('please enter something');
 
+  newText = newText
+    .split(/\s+/)
+    .map(text => text[0].toUpperCase() + text.slice(1).toLowerCase())
+    .join(' ');
+
   if (isEditMode) {
     const itemToEdit = items.querySelector('li.edit-modo');
 
@@ -35,19 +40,18 @@ function onAddItemSubmit(event) {
     itemToEdit.remove();
 
     // Prettier-ignore
-    !isEditMode
+    isEditMode = false
       ? btnForm.classList.remove('edited-modo')
       : btnForm.classList.add('add-modo');
     !btnForm.classList.contains('edited-modo')
       ? (btnForm.innerHTML = '<i class="fa-solid fa-pen"></i> Update Item')
       : (btnForm.innerHTML = '<i class="fa-solid fa-plus"></i>Add Item');
   } else {
-    console.log('nao eesta em editcao');
+    if (checkIfItemExists(newText)) {
+      alert('That item already exists');
+      return;
+    }
   }
-  newText = newText
-    .split(/\s+/)
-    .map(text => text[0].toUpperCase() + text.slice(1).toLowerCase())
-    .join(' ');
 
   // if(document.querySelectorAll('ul li').forEach(el => el.textContent.indexOf(newText) - 1)){
   //   alert('Nao Existe')
@@ -126,6 +130,11 @@ function onClickRemoveItem(item) {
   return;
 }
 
+function checkIfItemExists(item) {
+  const itemsFromStorage = getItemsFromlStorage();
+  return itemsFromStorage.includes(item);
+}
+
 function setItemToEdit(item) {
   // removendo classe hidden no "button " remove
   document.querySelector('ul button.hidden')?.classList.remove('hidden');
@@ -154,20 +163,22 @@ function removeItemDom(event) {
     if (event.target !== this)
       // prettier-ignore
 
-      console.log('aqui edit');
-
-    setItemToEdit(event.target);
+      setItemToEdit(event.target);
   }
 }
 function removeItem(item) {
   if (confirm('Are you sure?')) {
     item.remove();
     let element = item.textContent.trim();
-
-    // Vericando se o item contains a clalist se for sim antes de remover o  item dentro de ul, remover a classliss
-  
     document.querySelector('.edit-modo').classList.remove('edit-modo');
+    // item.querySelector('button').classList.remove('hidden');
+    // Vericando se o item contains a clalist se for sim antes de remover o  item dentro de ul, remover a classliss
+
     inputForm.value = '';
+    
+    !btnForm.classList.contains('edited-modo')
+      ? (btnForm.innerHTML = '<i class="fa-solid fa-pen"></i> Update Item')
+      : (btnForm.innerHTML = '<i class="fa-solid fa-plus"></i>Add Item');
     const respo = JSON.parse(localStorage.getItem('items')) || [];
     let updatedItems = respo.filter(i => i !== element);
 
