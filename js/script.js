@@ -7,42 +7,57 @@ const btnClear = document.querySelector('.btn-clear-all');
 const btnForm = formItem.querySelector('.addItem');
 let isEditMode = false;
 
+function displayItems() {
+  const itemsFromStorage = getItemsFromlStorage();
+
+  itemsFromStorage.forEach(item => {
+    addItemToDom(item);
+    console.log(item);
+  });
+}
+
 function onAddItemSubmit(event) {
   this.classList.add('transition', 'duration-200');
   event.preventDefault();
   const valueInput = event.target.elements.input;
-  const newText = valueInput.value;
+  let newText = valueInput.value.trim();
 
   // Check input value  === ""
 
   if (newText === '') return alert('please enter something');
 
-  // Create Item DOM element
-  addItemToDom(newText);
-  addItemToStorage(newText);
-  // Add Item to local storage
-  // Check for Edit Modo
   if (isEditMode) {
-    isEditMode = false;
     const itemToEdit = items.querySelector('li.edit-modo');
+
     itemToEdit?.classList.remove('edit-modo');
     itemToEdit.remove();
 
     // Prettier-ignore
-    isEditMode
+    !isEditMode
       ? btnForm.classList.remove('edited-modo')
       : btnForm.classList.add('add-modo');
     !btnForm.classList.contains('edited-modo')
       ? (btnForm.innerHTML = '<i class="fa-solid fa-pen"></i> Update Item')
       : (btnForm.innerHTML = '<i class="fa-solid fa-plus"></i>Add Item');
+  } else {
+    console.log('nao eesta em editcao');
   }
+  newText = newText
+    .split(/\s+/)
+    .map(text => text[0].toUpperCase() + text.slice(1).toLowerCase())
+    .join(' ');
 
-  valueInput.value = '';
+  addItemToDom(newText);
+  addItemToStorage(newText);
   btnForm.classList.remove('edited-modo');
   btnForm.classList.add('add-modo');
+  valueInput.value = '';
+  isEditMode = false;
 }
 
 function addItemToDom(text) {
+  // let istrue = false;
+  // if(istrue) {};
   // Create and appdending child
   const li = document.createElement('li');
   li.classList.add(
@@ -61,12 +76,7 @@ function addItemToDom(text) {
   const button = creatButton('flex items-center justify-content-between');
   li.appendChild(button);
 
-  setTimeout(
-    () => {
-      items.appendChild(li);
-    },
-    Math.random() * 5 * 100,
-  );
+  items.appendChild(li);
   checkUI(0);
 }
 
@@ -84,7 +94,7 @@ function createIcon(classes) {
   return icon;
 }
 function addItemToStorage(item) {
-  let itemsFormStorage = getItemsFromlStorage();
+  const itemsFormStorage = getItemsFromlStorage();
   // Add new Item to Array
   itemsFormStorage.push(item);
   // Convertendo JSON para JSON Stringfy
@@ -109,10 +119,15 @@ function onClickRemoveItem(item) {
 }
 
 function setItemToEdit(item) {
+  // removendo classe hidden no "button " remove
+  document.querySelector('ul button.hidden')?.classList.remove('hidden');
+  // Removendo classe edit-mode para "li"
   document.querySelector('.edit-modo')?.classList.remove('edit-modo');
-  isEditMode = true;
-  item.classList.add('edit-modo');
 
+  isEditMode = true;
+  // Adicionando as Classes
+  item.classList.add('edit-modo');
+  item.querySelector('button').classList.add('hidden');
   btnForm.classList.add('edited-modo');
   btnForm.classList.remove('add-modo');
 
@@ -130,7 +145,10 @@ function removeItemDom(event) {
   } else {
     if (event.target !== this)
       // prettier-ignore
-      setItemToEdit(event.target);
+
+      console.log('aqui edit');
+
+    setItemToEdit(event.target);
   }
 }
 function removeItem(item) {
@@ -142,8 +160,8 @@ function removeItem(item) {
     let updatedItems = respo.filter(i => i !== element);
 
     localStorage.setItem('items', JSON.stringify(updatedItems));
-    checkLength();
     checkUI(0);
+    checkLength();
   }
 }
 // Getting All Elements in the DOM Page
@@ -223,6 +241,7 @@ function editItem(item) {
     btnAdItem.innerHTML = `<i class="fa-solid fa-pen text-white"></i> Edit Item`;
     btnAdItem.className =
       'bg-green-500 hover:bg-green-600 cursor-pointer text-white mt-4 p-2 md:w-full rounded';
+    checkUI(0);
   } else {
     btnAdItem.innerHTML = ` <i class="fa-solid fa-plus text-white"></i> Add Item`;
     btnAdItem.className =
@@ -232,7 +251,7 @@ function editItem(item) {
 
 function resizeModo(e) {
   const h1 = document.querySelector('h1');
-  if (window.innerWidth <= 515 || matchMedia('(max-width: 500px').matches) {
+  if (window.innerWidth <= 515 || matchMedia('(max-width: 500px)').matches) {
   } else {
     document.body.style.backgroundColor = 'initial';
     console.log('false');
@@ -247,18 +266,19 @@ document.addEventListener('DOMContentLoaded', () => {
   btnClear.addEventListener('click', clearItems);
   checkUI(0);
   checkLength();
+  displayItems();
 });
 
-const itemsLocal = JSON.parse(localStorage.getItem('items'));
+// const itemsLocal = JSON.parse(localStorage.getItem('items'));
 
-itemsLocal?.forEach(text => {
-  const html = `<li
-            class="flex items-center hover:bg-linear-to-t from-gray-900/9 transition hover:text-slate-600 duration-150 cursor-pointer justify-between p-2 bg-slate-200 rounded"
-          >
-            ${text}
-            <button>
-              <i class="fa-solid fa-xmark text-red-500 cursor-pointer"></i>
-            </button>
-          </li>`;
-  items.insertAdjacentHTML('afterbegin', html);
-});
+// itemsLocal?.forEach(text => {
+//   const html = `<li
+//             class="flex items-center hover:bg-linear-to-t from-gray-900/9 transition hover:text-slate-600 duration-150 cursor-pointer justify-between p-2 bg-slate-200 rounded"
+//           >
+//             ${text}
+//             <button>
+//               <i class="fa-solid fa-xmark text-red-500 cursor-pointer"></i>
+//             </button>
+//           </li>`;
+//   items.insertAdjacentHTML('afterbegin', html);
+// });
