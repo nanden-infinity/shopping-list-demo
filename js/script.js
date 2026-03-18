@@ -227,6 +227,9 @@ function limparInput() {
 // Filter Input
 
 function filterItems(e) {
+  const div = e.target.parentElement;
+  const r = div.classList.remove('border-b-2');
+
   const listItems = Array.from(items.querySelectorAll('li'));
   listItems.filter(item => {
     if (
@@ -237,6 +240,11 @@ function filterItems(e) {
       item.style.display = 'flex';
     else item.style.display = 'none';
   });
+}
+function onBlur(e) {
+  const div = e.target.parentElement;
+  const r = div.classList.add('border-b-2');
+  console.log(div);
 }
 
 // Check Lenght Items
@@ -304,6 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
   formItem.addEventListener('submit', onAddItemSubmit);
   items.addEventListener('click', removeItemDom);
   inputFilter.addEventListener('input', filterItems);
+  inputFilter.addEventListener('blur', onBlur);
   btnClear.addEventListener('click', clearItems);
   checkUI(0);
   checkLength();

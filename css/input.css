@@ -19,10 +19,14 @@
   color: #ccc;
   font-weight: 600;
 }
-
+#input--item:focus {
+  box-shadow: 0 0 0 .5px var(--color-green-600);
+  border: 1px solid var(--color-green-500);
+  transition: 0.5s;
+}
 .show {
   animation: show 0.5s forwards;
-  transition: .5s;
+  transition: 0.5s;
 }
 
 @keyframes show {
