@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "postcss css/input.css -o css/output.css --watch"
+    "dev": "postcss css/input.css -o css/output.css --watch",
+    "repo": "git add . && git commit -m 'mensagem' && git push"
   },
   "keywords": [],
   "author": "",

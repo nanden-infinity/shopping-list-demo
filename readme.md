@@ -1,2 +1,2 @@
 # Projecto Lista de Compras
-# com Vanila Js && PostCSS Tailwindcss
+# Com Vanila JavaScript & PostCSS Tailwindcss

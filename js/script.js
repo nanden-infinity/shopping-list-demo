@@ -8,11 +8,10 @@ const btnForm = formItem.querySelector('.addItem');
 let isEditMode = false;
 
 function displayItems() {
-  const itemsFromStorage = getItemsFromlStorage();
+  const itemsFromStorage = getItemsFromStorage();
 
   itemsFromStorage.forEach(item => {
     addItemToDom(item);
-    console.log(item);
   });
 }
 
@@ -21,7 +20,7 @@ function displayItems() {
 function onAddItemSubmit(event) {
   this.classList.add('transition', 'duration-200');
   event.preventDefault();
-  const valueInput = event.target.elements.input;
+  const valueInput = inputForm;
   let newText = valueInput.value.trim();
 
   // Check input value  === ""
@@ -34,18 +33,17 @@ function onAddItemSubmit(event) {
     .join(' ');
 
   if (isEditMode) {
-    const itemToEdit = items.querySelector('li.edit-modo');
+    const itemToEdit = items?.querySelector('.edit-modo');
 
-    itemToEdit?.classList.remove('edit-modo');
+    if (!itemToEdit) {
+      isEditMode = false;
+      return;
+    }
+
+    itemToEdit.classList.remove('edit-modo');
     itemToEdit.remove();
 
-    // Prettier-ignore
-    isEditMode = false
-      ? btnForm.classList.remove('edited-modo')
-      : btnForm.classList.add('add-modo');
-    !btnForm.classList.contains('edited-modo')
-      ? (btnForm.innerHTML = '<i class="fa-solid fa-pen"></i> Update Item')
-      : (btnForm.innerHTML = '<i class="fa-solid fa-plus"></i>Add Item');
+    limparInput();
   } else {
     if (checkIfItemExists(newText)) {
       alert('That item already exists');
@@ -61,8 +59,9 @@ function onAddItemSubmit(event) {
   addItemToStorage(newText);
   btnForm.classList.remove('edited-modo');
   btnForm.classList.add('add-modo');
-  valueInput.value = '';
+  btnForm.innerHTML = '<i class="fa-solid fa-plus"></i>Add Item';
   isEditMode = false;
+  limparInput();
 }
 
 function addItemToDom(text) {
@@ -106,14 +105,14 @@ function createIcon(classes) {
   return icon;
 }
 function addItemToStorage(item) {
-  const itemsFormStorage = getItemsFromlStorage();
+  const itemsFormStorage = getItemsFromStorage();
   // Add new Item to Array
   itemsFormStorage.push(item);
   // Convertendo JSON para JSON Stringfy
   localStorage.setItem('items', JSON.stringify(itemsFormStorage));
 }
 
-function getItemsFromlStorage() {
+function getItemsFromStorage() {
   let itemsFormStorage;
   if (localStorage.getItem('items') === null) {
     itemsFormStorage = [];
@@ -131,8 +130,8 @@ function onClickRemoveItem(item) {
 }
 
 function checkIfItemExists(item) {
-  const itemsFromStorage = getItemsFromlStorage();
-  return itemsFromStorage.includes(item);
+  const itemsFromStorage = getItemsFromStorage();
+  return itemsFromStorage.some(i => i.toLowerCase() === item.toLowerCase());
 }
 
 function setItemToEdit(item) {
@@ -153,6 +152,12 @@ function setItemToEdit(item) {
     : (btnForm.innerHTML = '<i class="fa-solid fa-plus"></i>Add Item');
   inputForm.value = item.textContent.trim();
 }
+function removeItemFromStorage(item) {
+  const items = getItemsFromStorage().filter(i => i !== item);
+  localStorage.setItem('items', JSON.stringify(items));
+  return;
+}
+
 function removeItemDom(event) {
   const removeIcon = event.target;
 
@@ -173,18 +178,22 @@ function removeItem(item) {
     document.querySelector('.edit-modo').classList.remove('edit-modo');
     // item.querySelector('button').classList.remove('hidden');
     // Vericando se o item contains a clalist se for sim antes de remover o  item dentro de ul, remover a classliss
-
-    inputForm.value = '';
-    
+    btnForm.classList.remove('edited-modo');
+    btnForm.classList.add('add-modo');
     !btnForm.classList.contains('edited-modo')
-      ? (btnForm.innerHTML = '<i class="fa-solid fa-pen"></i> Update Item')
-      : (btnForm.innerHTML = '<i class="fa-solid fa-plus"></i>Add Item');
+      ? (btnForm.innerHTML = '<i class="fa-solid fa-plus"></i> Add Item')
+      : (btnForm.innerHTML = '<i class="fa-solid fa-plus"></i>Update Item');
+    document.querySelectorAll('ul button').forEach(btn => {
+      btn.classList.remove('hidden');
+    });
+
     const respo = JSON.parse(localStorage.getItem('items')) || [];
     let updatedItems = respo.filter(i => i !== element);
 
     localStorage.setItem('items', JSON.stringify(updatedItems));
     checkUI(0);
     checkLength();
+    limparInput();
   }
 }
 // Getting All Elements in the DOM Page
@@ -207,6 +216,13 @@ function removeItem(item) {
 //   card.style.display = "none";
 // }
 //  });
+
+// Limpar Input
+function limparInput() {
+  inputForm.value = '';
+  inputForm.focus();
+  inputFilter.value = '';
+}
 
 // Filter Input
 
@@ -236,6 +252,8 @@ function checkUI(status = 0) {
     btnForm.classList.add('add-modo');
     btnForm.innerHTML = '<i class="fa-solid fa-plus"></i>Add Item';
     inputForm.value = '';
+    inputForm.focus();
+    inputForm.focus();
   } else {
     inputFilter.parentElement.style.display = 'flex';
     btnClear.parentElement.style.display = 'flex';
